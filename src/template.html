@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gestão Contábil · Feliz Natal 2026</title>
+<meta name="theme-color" content="#060b12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#060b12; --bg2:#0d1a28;
+    --ciano:#3EC6E0; --cinza:#8A8A8F; --chumbo:#4a5560;
+    --branco:#EAF2F5; --vermelho:#E5404F; --ouro:#F2C14E; --verde:#43C78A; --pele:#F1D3BC; --fumo:#9aa7b0;
+    --mono:'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:var(--bg);color:var(--branco);font-family:var(--mono);overflow:hidden;-webkit-tap-highlight-color:transparent;user-select:none}
+  body{background:radial-gradient(120% 80% at 50% 0%, var(--bg2) 0%, var(--bg) 60%)}
+  #bg{position:fixed;inset:0;width:100%;height:100%;z-index:0}
+  #stage{position:fixed;inset:0;z-index:1;cursor:pointer}
+
+  .bars{position:absolute;top:max(14px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);width:min(92vw,560px);display:flex;gap:4px;z-index:5}
+  .bar{flex:1;height:3px;border-radius:3px;background:rgba(234,242,245,.15);overflow:hidden}
+  .bar i{display:block;height:100%;width:0;background:var(--ciano);box-shadow:0 0 8px var(--ciano)}
+  .bar.done i{width:100%}
+  .bar.now i{animation:fill var(--dur) linear forwards}
+  .bar.now.hold i{animation:none;width:100%}
+  @keyframes fill{to{width:100%}}
+  .brand{position:absolute;top:calc(max(14px,env(safe-area-inset-top)) + 14px);left:50%;transform:translateX(-50%);width:min(92vw,560px);font-size:11px;letter-spacing:.18em;color:var(--cinza);text-transform:uppercase;z-index:5}
+  .brand b{color:var(--ciano);font-weight:400}
+
+  .slide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(14px,3vh,28px);padding:76px 20px 64px;text-align:center;opacity:0;visibility:hidden;transition:opacity .7s ease,visibility .7s}
+  .slide.active{opacity:1;visibility:visible}
+
+  /* ASCII */
+  pre.art{font-family:var(--mono);line-height:1.12;white-space:pre;color:var(--ciano);text-shadow:0 0 10px rgba(62,198,224,.4);text-align:left;font-size:16px}
+  .ch,.cell{display:inline-block;width:1ch;text-align:center;font-variant-emoji:text}
+  .ch{opacity:0;transform:translate(var(--dx,0),var(--dy,0)) rotate(var(--r,0));
+      transition:transform 1.7s cubic-bezier(.16,.84,.24,1) var(--d,0ms), opacity .9s ease var(--d,0ms)}
+  .in .ch{opacity:1;transform:none}
+  .c-r{color:var(--vermelho);text-shadow:0 0 10px rgba(229,64,79,.55)}
+  .c-w{color:var(--branco);text-shadow:0 0 8px rgba(234,242,245,.35)}
+  .c-g{color:var(--ouro);text-shadow:0 0 10px rgba(242,193,78,.55)}
+  .c-k{color:var(--chumbo);text-shadow:none}
+  .c-c{color:var(--ciano);text-shadow:0 0 10px rgba(62,198,224,.55)}
+  .c-s{color:var(--pele);text-shadow:none}
+  .c-v{color:var(--verde);text-shadow:0 0 8px rgba(67,199,138,.45)}
+  .c-m{color:var(--fumo);text-shadow:none;opacity:.8}
+  .c-d{opacity:.45}
+  .c-o{color:#ff8a3d;text-shadow:0 0 10px rgba(255,138,61,.6)}
+  .tw{animation:tw var(--tw,1.6s) ease-in-out infinite;animation-delay:var(--twd,0s)}
+  @keyframes tw{50%{filter:brightness(.35)}}
+
+  .float{animation:float 6s ease-in-out infinite}
+  .float.b{animation-duration:7s;animation-delay:-2.5s}
+  @keyframes float{0%,100%{transform:translateY(-7px) rotate(-.5deg)}50%{transform:translateY(7px) rotate(.5deg)}}
+  .shake{animation:shake .22s linear infinite}
+  @keyframes shake{0%{transform:translate(0,0)}25%{transform:translate(1.5px,-1px)}50%{transform:translate(-1px,1.5px)}75%{transform:translate(1px,1px)}100%{transform:translate(0,0)}}
+  .breath{animation:breath 2.4s ease-in-out infinite}
+  @keyframes breath{50%{transform:scale(1.015)}}
+
+  .cap{font-size:clamp(14px,4vw,19px);line-height:1.55;max-width:32ch;font-weight:300;min-height:3.1em}
+  .cap.small{font-size:clamp(12px,3.3vw,15px);color:var(--cinza);min-height:1.6em}
+  .cap em{font-style:normal;color:var(--ciano)}
+  .typing::after{content:'▌';color:var(--ciano);animation:blink .8s steps(1) infinite;margin-left:2px}
+  @keyframes blink{50%{opacity:0}}
+  .kicker{font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--cinza)}
+
+  /* 1 */
+  .wordmark{font-size:clamp(13px,3.6vw,17px);letter-spacing:.32em;color:var(--branco);opacity:0;transition:opacity 1.2s ease 2.2s}
+  .wordmark span{display:block;font-size:.7em;letter-spacing:.2em;color:var(--cinza);margin-top:6px;font-style:italic}
+  .active .wordmark.show{opacity:1}
+
+  /* 2 */
+  .stats{display:grid;gap:8px;width:min(88vw,380px)}
+  .stat{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:14px;text-align:left;border:1px solid rgba(62,198,224,.22);border-radius:14px;padding:10px 16px;background:rgba(62,198,224,.04);
+        opacity:0;transform:translateY(24px) scale(.97);transition:all .9s cubic-bezier(.16,.84,.24,1)}
+  .stat.show{opacity:1;transform:none}
+  .stat .n{font-size:clamp(22px,7vw,32px);font-weight:700;color:var(--ciano);text-shadow:0 0 14px rgba(62,198,224,.5);min-width:3.2ch}
+  .stat .l{font-size:13px;color:var(--branco);letter-spacing:.04em;line-height:1.35}
+  .stat .l small{display:block;color:var(--cinza);font-size:11px;margin-top:2px;letter-spacing:.02em}
+  .stat:nth-child(even).show{animation:float 6.5s ease-in-out infinite -1s}
+
+  /* 3 prédio */
+  .zoomwrap{transition:transform 1.3s cubic-bezier(.7,0,.3,1), opacity 1s ease .3s}
+  .zoomwrap.zoom{transform:scale(4.2);opacity:0}
+  .hl .cell{color:var(--ciano)!important;text-shadow:0 0 12px var(--ciano)!important;animation:hlb .7s steps(1) infinite}
+  @keyframes hlb{50%{opacity:.45}}
+  .lit{color:var(--ouro)!important;text-shadow:0 0 10px rgba(242,193,78,.7)!important}
+  .stack{position:relative;display:grid;place-items:center}
+  .stack > *{grid-area:1/1}
+  .office-in{opacity:0;transform:scale(.6);transition:all 1s cubic-bezier(.16,.84,.24,1)}
+  .office-in.show{opacity:1;transform:none}
+
+  /* fases */
+  .phase-head{display:flex;flex-direction:column;align-items:center;gap:8px}
+  .phase-title{font-size:clamp(22px,7.2vw,38px);font-weight:700;letter-spacing:.16em}
+  .dots{display:flex;gap:10px;font-size:12px;color:var(--chumbo)}
+  .dots b{font-weight:400}
+  .dots .on{color:var(--branco)}
+  pre.office{color:#c4cfd6;text-shadow:none}
+
+  /* sócios */
+  .santas{display:flex;gap:clamp(6px,3vw,32px);align-items:flex-end;justify-content:center}
+  .santa{display:flex;flex-direction:column;align-items:center;gap:6px}
+
+  /* mensagem */
+  .letter{max-width:min(90vw,460px);text-align:left;display:flex;flex-direction:column;gap:14px;
+          border-left:2px solid rgba(62,198,224,.45);padding:6px 0 6px 18px}
+  .letter p{font-size:clamp(14px,3.9vw,18px);line-height:1.6;font-weight:300;min-height:1.6em}
+  .letter p em{font-style:normal;color:var(--ciano)}
+  .letter .from{color:var(--ciano);font-size:clamp(13px,3.6vw,16px);letter-spacing:.06em}
+
+  /* feliz natal */
+  .xmas{display:flex;flex-direction:column;align-items:center;gap:clamp(6px,2vh,18px)}
+  .signoff{font-size:12px;letter-spacing:.3em;color:var(--cinza);text-transform:uppercase;opacity:0;transition:opacity 1.2s}
+  .signoff.show{opacity:1}
+
+  /* créditos */
+  .slide.credits{display:block;padding:0;overflow:hidden;
+    -webkit-mask-image:linear-gradient(transparent 0, #000 16%, #000 84%, transparent 100%);
+            mask-image:linear-gradient(transparent 0, #000 16%, #000 84%, transparent 100%)}
+  #roll{position:absolute;left:0;right:0;top:0;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0 24px;will-change:transform}
+  #roll .h{font-size:clamp(18px,5.6vw,28px);font-weight:700;letter-spacing:.08em;color:var(--branco);line-height:1.35}
+  #roll .h b{color:var(--vermelho)} #roll .h i{font-style:normal;color:var(--ouro)}
+  #roll .sub{font-size:12px;letter-spacing:.25em;color:var(--cinza);text-transform:uppercase}
+  #roll .sp{height:48px}
+  #roll .t{margin-top:44px;margin-bottom:8px;font-size:11px;letter-spacing:.35em;color:var(--ciano);text-transform:uppercase}
+  #roll .t::before,#roll .t::after{content:' ─── ';color:var(--chumbo)}
+  #roll .n{font-size:clamp(15px,4.4vw,20px);color:var(--branco);letter-spacing:.06em}
+  #roll .q{font-size:clamp(13px,3.9vw,17px);color:#cfd8dc;font-style:italic;font-weight:300}
+  #roll .q::before{content:'“';color:var(--ouro)} #roll .q::after{content:'”';color:var(--ouro)}
+  #roll .cr{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:min(92vw,460px);align-items:baseline;padding:3px 0}
+  #roll .cr .nm{text-align:right;font-size:clamp(13px,3.9vw,17px);color:var(--branco)}
+  #roll .cr .rl{text-align:left;font-size:clamp(11px,3.2vw,14px);color:var(--cinza);letter-spacing:.04em}
+  #roll .fine{font-size:11px;color:var(--cinza);letter-spacing:.06em;margin-top:2px}
+  #endBlock{margin-top:90px;display:flex;flex-direction:column;align-items:center;gap:16px;padding-bottom:40px}
+  .replay{font-family:var(--mono);font-size:13px;letter-spacing:.15em;color:var(--ciano);background:transparent;border:1px solid rgba(62,198,224,.5);padding:10px 20px;border-radius:999px;cursor:pointer;opacity:0;transition:opacity 1s, background .3s;pointer-events:none}
+  .replay.show{opacity:1;pointer-events:auto}
+  .replay:hover{background:rgba(62,198,224,.1)}
+
+  .hint{position:absolute;bottom:max(16px,env(safe-area-inset-bottom));left:0;right:0;text-align:center;font-size:11px;letter-spacing:.25em;color:rgba(138,138,143,.7);text-transform:uppercase;animation:hint 2.4s ease-in-out infinite;z-index:5;transition:opacity .6s;pointer-events:none}
+  @keyframes hint{50%{opacity:.35}}
+
+  @media (prefers-reduced-motion: reduce){
+    .float,.shake,.breath,.stat,.tw{animation:none!important}
+    .ch{transition-duration:.01ms!important}
+  }
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+
+<div id="stage">
+  <div class="bars" id="bars"></div>
+  <div class="brand"><b>⬡</b> Gestão Contábil · 2026</div>
+
+  <!-- 1 · logo -->
+  <section class="slide" data-dur="7000">
+    <div class="float"><pre class="art" id="logoArt"></pre></div>
+    <div class="wordmark" id="wm">GESTÃO CONTÁBIL<span>Soluções Contábeis</span></div>
+    <p class="cap" id="c1"></p>
+  </section>
+
+  <!-- 2 · números -->
+  <section class="slide" data-dur="10500">
+    <p class="kicker">o seu 2026, contabilizado em momentos</p>
+    <div class="stats">
+      <div class="stat"><span class="n" data-to="12" data-prefix="+">0</span><span class="l">meses de competência</span></div>
+      <div class="stat"><span class="n" data-to="250" data-suffix="+">0</span><span class="l">dias de dedicação</span></div>
+      <div class="stat"><span class="n" data-inf>∞</span><span class="l">cafés</span></div>
+      <div class="stat"><span class="n" data-to="7">0</span><span class="l">setores<small>contábil · fiscal · pessoal · paralegal · financeiro · T.I e desenvolvimento · comercial</small></span></div>
+      <div class="stat"><span class="n" data-to="1">0</span><span class="l">time</span></div>
+    </div>
+    <p class="cap" id="c2"></p>
+  </section>
+
+  <!-- 3 · prédio -->
+  <section class="slide" data-dur="9000">
+    <div class="stack">
+      <div class="zoomwrap" id="zw"><pre class="art office" id="building"></pre></div>
+      <div class="office-in" id="oiWrap"><pre class="art office" id="officeIdle"></pre></div>
+    </div>
+    <p class="cap" id="c3"></p>
+  </section>
+
+  <!-- 4..7 · fases (montadas via JS) -->
+  <section class="slide phase" data-dur="8500" data-phase="0"></section>
+  <section class="slide phase" data-dur="8500" data-phase="1"></section>
+  <section class="slide phase" data-dur="8000" data-phase="2"></section>
+  <section class="slide phase" data-dur="8000" data-phase="3"></section>
+
+  <!-- 8 · sócios -->
+  <section class="slide" data-dur="9000">
+    <div class="santas">
+      <div class="santa float"><pre class="art" id="n1"></pre><pre class="art" id="s1"></pre></div>
+      <div class="santa float b"><pre class="art" id="n2"></pre><pre class="art" id="s2"></pre></div>
+    </div>
+    <p class="cap" id="c8"></p>
+  </section>
+
+  <!-- 9 · mensagem -->
+  <section class="slide" data-dur="17000">
+    <div class="letter" id="letter">
+      <p id="p1"></p><p id="p2"></p><p id="p3"></p><p class="from" id="p4"></p>
+    </div>
+  </section>
+
+  <!-- 10 · FELIZ NATAL + árvore -->
+  <section class="slide" data-dur="10000">
+    <div class="xmas">
+      <pre class="art breath" id="feliz"></pre>
+      <pre class="art breath" id="natal"></pre>
+      <div class="float"><pre class="art" id="tree"></pre></div>
+      <p class="signoff" id="so">da Gestão Contábil para você</p>
+    </div>
+  </section>
+
+  <!-- 11 · 2026 → 2027 -->
+  <section class="slide" data-dur="9000">
+    <div class="float"><pre class="art" id="year"></pre></div>
+    <p class="cap" id="c11"></p>
+  </section>
+
+  <!-- 12 · créditos -->
+  <section class="slide credits" data-dur="0">
+    <div id="roll"></div>
+  </section>
+
+  <div class="hint" id="hint">toque para avançar ›</div>
+</div>
+
+<script>
+/* =====================================================================
+   CONFIGURAÇÃO — edite aqui
+   ===================================================================== */
+const CONFIG = {
+  // ritmo: 1 = original. Aumente para deixar mais lento.
+  ritmo: 1.6,          // tempo de cada cena
+  digitacao: 1.4,      // velocidade do texto digitado (maior = mais lento)
+  animacao: 1.5,       // velocidade dos quadros do escritório (maior = mais lento)
+  creditosPxPorSeg: 24,// velocidade dos créditos subindo
+  // sócios: [esquerda (Noel moderno, sem barba), direita (Noel clássico, com barba)]
+  socios: ['Renato', 'Valter'],
+  // créditos: [nome, setor/cargo]
+  colaboradores: [
+    ['Alessandro Barreto', 'Contabilidade'],
+    ['Erlane Carvalho', 'Contabilidade'],
+    ['Fabio Teixeira', 'Fiscal'],
+    ['Heverton Costa', 'Contabilidade'],
+    ['Kessia Vatuse', 'Fiscal'],
+    ['Lais Barroso', 'Contabilidade'],
+    ['Lidiane Nascimento', 'Departamento Pessoal'],
+    ['Luciano Cena', 'Fiscal'],
+    ['Marcella Guimarães', 'Fiscal'],
+    ['Maria Eduarda Lins', 'Contabilidade'],
+    ['Maria Luiza Duarte', 'Contabilidade'],
+    ['Mariana Cruvinel', 'Contabilidade'],
+    ['Matheus Izjob', 'Fiscal'],
+    ['Mayara Marques', 'T.I e Desenvolvimento'],
+    ['Muriel Janine Dias', 'Financeiro'],
+    ['Neuzirene Soares', 'Departamento Pessoal'],
+    ['Paulo Renato Nunes', 'Faz tudo'],
+    ['Renata Salvino', 'Fiscal'],
+    ['Ricardo Feijão', 'Contabilidade'],
+    ['Sarah Ferreira', 'Paralegal'],
+    ['Simone Sousa', 'Contabilidade'],
+    ['Valdivone Dias', 'Fiscal e T.I'],
+    ['Verônica Mantovani', 'Departamento Pessoal'],
+    ['Victor Giffoni', 'Contabilidade'],
+    ['Vitor Sousa', 'Fiscal'],
+    ['Wanessa Morais', 'Comercial'],
+    ['Yasmim Carvalho', 'Fiscal'],
+  ],
+  bordoes: [
+    'All right!', 'Você bebeu?', 'Geeentiiii', 'Pô, aí você me quebra', 'Bom dia!', 'Adeus!', 'Ainda, é nada.',
+  ],
+  bastidores: [
+    'Já fez o café?', 'Já quero ir embora.', 'Tô com fome.', 'Abriram o período anterior.',
+    'Bagunçaram o saldo do banco.', 'Tem que pedir os extratos.', 'O cliente já mandou as guias?',
+    'Quem me dera pagar 10 mil de imposto.', 'Ficou sabendo?', 'Tem que publicar a guia pro cliente.',
+    'E aí, já acabou?', 'Gera essa guia pra mim?',
+    'Cadê o comprovante?', 'O sistema caiu de novo.', 'Deu diferença de um centavo.', 'Vence hoje!',
+    'Quem lançou isso aqui?', 'Só falta o cliente mandar…', 'Reinicia que volta.', 'Isso aí é com o fiscal.',
+    'O certificado venceu.', 'Manda no grupo.', 'Na sexta a gente vê.', 'Calma, é só conciliar.',
+  ],
+};
+const FIG = __FIG__;   // letreiros gerados pelo build.py (pyfiglet)
+</script>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+
+  /* ---------------- fundo: neve ASCII + fogos ---------------- */
+  const cv = $('bg'), ctx = cv.getContext('2d');
+  let W, H, DPR, snow = [], sparks = [];
+  const SNOW = ['*','·','.','+','˚','·'];
+  function resize(){
+    DPR = Math.min(window.devicePixelRatio||1, 2);
+    W = innerWidth; H = innerHeight;
+    cv.width = W*DPR; cv.height = H*DPR; ctx.setTransform(DPR,0,0,DPR,0,0);
+    const n = Math.round(W*H/9000);
+    snow = Array.from({length:n}, () => ({
+      x:Math.random()*W, y:Math.random()*H, v:.15+Math.random()*.55,
+      s:8+Math.random()*10, ch:SNOW[Math.random()*SNOW.length|0],
+      a:.08+Math.random()*.35, ph:Math.random()*6.28, cian:Math.random()<.25
+    }));
+    document.querySelectorAll('pre.art').forEach(p => p._fit && fit(p, p._fit));
+  }
+  addEventListener('resize', resize);
+
+  function burst(x, y, n=70){
+    const cols = ['#3EC6E0','#E5404F','#F2C14E','#EAF2F5','#43C78A'];
+    const chs = ['*','+','·','o','✦','.'];
+    for(let i=0;i<n;i++){
+      const a = Math.random()*Math.PI*2, sp = 1.5+Math.random()*4.5;
+      sparks.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:1,ch:chs[Math.random()*chs.length|0],col:cols[Math.random()*cols.length|0],s:10+Math.random()*8});
+    }
+  }
+  function loop(t){
+    ctx.clearRect(0,0,W,H);
+    for(const p of snow){
+      p.y += p.v; p.x += Math.sin(t*.0008+p.ph)*.25;
+      if(p.y > H+20){ p.y = -20; p.x = Math.random()*W; }
+      ctx.globalAlpha = p.a; ctx.fillStyle = p.cian ? '#3EC6E0' : '#EAF2F5';
+      ctx.font = p.s+'px JetBrains Mono, monospace'; ctx.fillText(p.ch, p.x, p.y);
+    }
+    for(let i=sparks.length-1;i>=0;i--){
+      const p = sparks[i];
+      p.x += p.vx; p.y += p.vy; p.vy += .05; p.vx *= .985; p.life -= .012;
+      if(p.life <= 0){ sparks.splice(i,1); continue; }
+      ctx.globalAlpha = Math.max(0,p.life); ctx.fillStyle = p.col;
+      ctx.font = p.s+'px JetBrains Mono, monospace'; ctx.fillText(p.ch, p.x, p.y);
+    }
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(loop);
+  }
+
+  /* ---------------- motor de ASCII ---------------- */
+  let run = 0;
+  const wait = (ms, id) => new Promise(r => setTimeout(() => id===run && r(), ms * CONFIG.ritmo));
+  const every = (ms, id, fn) => { const iv = setInterval(() => { if(id!==run) return clearInterval(iv); fn(); }, ms); return iv; };
+
+  // rows: string | {t:texto, c:classe-da-linha, m:máscara de cores por caractere}
+  function render(pre, rows, o={}){
+    rows = rows.map(r => typeof r === 'string' ? {t:r} : r);
+    const Wc = o.width || Math.max(...rows.map(r => [...r.t].length));
+    pre.innerHTML = ''; pre.classList.remove('in');
+    const cells = [];
+    rows.forEach((R, ri) => {
+      const chars = [...R.t]; while(chars.length < Wc) chars.push(' ');
+      const mask = R.m ? [...R.m] : [];
+      const row = document.createElement('span');
+      row.className = 'row' + (R.c ? ' c-'+R.c : '');
+      const rc = [];
+      chars.forEach((ch, ci) => {
+        const s = document.createElement('span');
+        s.className = o.fly ? 'ch' : 'cell';
+        s.textContent = ch === ' ' ? '\u00a0' : ch;
+        const k = (mask[ci] && mask[ci] !== ' ') ? mask[ci] : (o.map && o.map[ch]);
+        if(k) s.classList.add('c-'+k);
+        if(o.fly && ch !== ' '){
+          const sp = o.spread ?? 1;
+          const dy = o.from === 'top' ? -(45+Math.random()*70) : (Math.random()-.5)*90;
+          s.style.setProperty('--dx', ((Math.random()-.5)*50*sp)+'vw');
+          s.style.setProperty('--dy', (dy*sp)+'vh');
+          s.style.setProperty('--r', ((Math.random()-.5)*420)+'deg');
+          s.style.setProperty('--d', (Math.random()*(o.stagger ?? 1000))+'ms');
+        }
+        if(o.decorate) o.decorate(s, ch, ri, ci);
+        row.appendChild(s); rc.push(s);
+      });
+      pre.appendChild(row); pre.appendChild(document.createTextNode('\n'));
+      cells.push(rc);
+    });
+    pre._cells = cells; pre._rows = rows.length; pre._cols = Wc;
+    if(o.fit){ pre._fit = o.fit; fit(pre, o.fit); }
+    if(o.fly) requestAnimationFrame(() => requestAnimationFrame(() => pre.classList.add('in')));
+    return cells;
+  }
+  function fit(pre, {w=.9, h=.4, max=24}={}){
+    const maxW = Math.min(innerWidth*w, 620), maxH = innerHeight*h;
+    const fs = Math.min(max, maxW/(pre._cols*0.6), maxH/(pre._rows*1.12));
+    pre.style.fontSize = fs.toFixed(2)+'px';
+  }
+  function type(el, html, id, speed=32){
+    const plain = html.replace(/<[^>]+>/g,''), chars = [...plain];
+    el.textContent = ''; el.classList.add('typing');
+    return new Promise(res => {
+      let n = 0;
+      const iv = setInterval(() => {
+        if(id !== run){ clearInterval(iv); el.classList.remove('typing'); return; }
+        el.textContent = chars.slice(0, ++n).join('');
+        if(n >= chars.length){ clearInterval(iv); el.innerHTML = html; el.classList.remove('typing'); res(); }
+      }, speed * CONFIG.digitacao);
+    });
+  }
+  function count(el, to, id, pre='', suf='', dur=2200){
+    const t0 = performance.now();
+    (function f(now){
+      if(id !== run) return;
+      const p = Math.min(1,(now-t0)/dur), e = 1-Math.pow(1-p,3);
+      el.textContent = (p===1?pre:'') + Math.round(to*e) + (p===1?suf:'');
+      if(p < 1) requestAnimationFrame(f);
+    })(t0);
+  }
+  const pick = a => a[Math.random()*a.length|0];
+
+  /* ---------------- artes ---------------- */
+  const LOGO = [
+    {t:"      __________      ", c:'k'},
+    {t:"     /  ______  \\     ", c:'k'},
+    {t:"    /  /  ____|  \\    "},
+    {t:"   /  /  /  __    \\   "},
+    {t:"   \\  \\  \\_|_ |   /   "},
+    {t:"    \\  \\_____|   /    "},
+    {t:"     \\__________/     ", c:'k'},
+  ];
+
+  const OMAP = { '^':'r', '°':'m', '!':'r', '#':'w', '▓':'c', '╨':'k', '$':'g', '♥':'r', '♪':'c', '~':'m',
+                 '☼':'g', '*':'g', '✦':'g', '+':'g', '▲':'v', '║':'k', '@':'w', 'o':'w', 'O':'w', '■':'k',
+                 '╔':'k','╗':'k','╚':'k','╝':'k','═':'k','│':'k','─':'k','┘':'g','└':'g','╷':'g','╭':'m','╮':'m','╰':'m','╯':'m',
+                 '✿':'r','[':'g',']':'g','z':'c','?':'g','⬡':'c' };
+  const INNER = 32;
+  const box = rows => [
+    '╔' + '═'.repeat(INNER) + '╗',
+    ...rows.map(r => '║' + [...r].concat(Array(Math.max(0, INNER-[...r].length)).fill(' ')).slice(0,INNER).join('') + '║'),
+    '╚' + '═'.repeat(INNER) + '╝',
+  ].map(t => ({t: t.replaceAll('║','│')}));
+
+  const BUILDING = [
+    "      CAPITAL FINANCIAL CENTER · BLOCO B           ",
+    "      _____________________________                ",
+    "     |  ■   ■   ■   ■   ■   ■   ■  |  3º           ",
+    "     |                             |               ",
+    "     |  ■   ■   ■   ■   ■   ■   ■  |  2º           ",
+    "     |                             |               ",
+    "     |  ■   ■   ■   ■   ■   ■   ■  |  1º ⬡ sala 126",
+    "     |                             |               ",
+    "     |  ■   ■   ┌───────┐   ■   ■  |  térreo       ",
+    "     |__________|_______|__________|               ",
+    "  ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔          ",
+  ];
+  const IDLE = box([
+    "",
+    "   ┌─┐      ┌─┐      ┌─┐     ",
+    "   o▓       o▓       o▓      ",
+    "  /|╨      /|╨      /|╨      ",
+    "  / \\      / \\      / \\      ",
+    "",
+  ]);
+
+  const PHASES = [
+    { title:'SOBREVIVÊNCIA', period:'JAN · FEV · MAR', color:'var(--vermelho)', fx:'shake', speed:260,
+      text:'Fechamento do ano, balanço, prazo em cima de prazo. <em>O escritório pegou fogo — e ninguém largou o posto.</em>',
+      frames:[[
+        " ^  ^^  ^   ^^   ^  ^^  ^   ^^ ",
+        "^^^^^^^^ ^^^^^^ ^^^^^^^ ^^^^^^ ",
+        "   °°         !!       #   #   ",
+        "   @     \\o/       #  o    #   ",
+        "  /|\\▓    |  >>      /|\\▓▓     ",
+        "  / \\╨   / \\         / \\╨╨  #  ",
+      ],[
+        "^^  ^  ^^^  ^  ^^^  ^^  ^^^  ^ ",
+        " ^^^^^^^ ^^^^^^^ ^^^^^^ ^^^^^^^",
+        "    °°°      !!!     #    #    ",
+        "   @           \\o/   o  #      ",
+        "  /|\\▓   <<     |   /|\\▓▓    # ",
+        "  / \\╨         / \\  / \\╨╨      ",
+      ]]},
+    { title:'TRINCHEIRA', period:'ABR · MAI · JUN', color:'var(--ouro)', fx:'breath', speed:520,
+      text:'Imposto de Renda, grandes entregas e uma corrida contra o relógio. <em>Cabeça baixa, café do lado, ninguém recuou.</em>',
+      frames:[[
+        "  ╭────╮   tic         #       ",
+        "  │ ╷  │            #  #   #   ",
+        "  │ └─ │         #  #  #   #   ",
+        "  ╰────╯         #  #  #   #   ",
+        "   o▓   o▓   o▓   o▓   o▓  c[] ",
+        "  /|╨  /|╨  /|╨  /|╨  /|╨      ",
+      ],[
+        "  ╭────╮       tac     #   #   ",
+        "  │  ╷ │         #  #  #   #   ",
+        "  │ ─┘ │         #  #  #   #   ",
+        "  ╰────╯      #  #  #  #   #   ",
+        "   o ▓  o ▓  o ▓  o ▓  o ▓ c[] ",
+        "  /|╨  /|╨  /|╨  /|╨  /|╨      ",
+      ]]},
+    { title:'RESPIRO', period:'JUL · AGO · SET', color:'var(--ciano)', fx:'float', speed:900,
+      text:'A poeira baixou. Hora de arrumar a casa, colocar tudo em dia <em>e respirar fundo.</em>',
+      frames:[[
+        "    \\ | /               ~      ",
+        "   -- ☼ --             ~       ",
+        "    / | \\            c[]       ",
+        "                               ",
+        "   o      ♪          o    \\✿/  ",
+        "  <|\\_▓       ___   /|\\    |   ",
+        "  / >╨       |___|  / \\   _|_  ",
+      ],[
+        "     \\|/                ~      ",
+        "   - ☼ -                ~      ",
+        "     /|\\             c[]       ",
+        "          ♪                    ",
+        "   o                 o    \\✿/  ",
+        "  <|\\_▓       ___   /|\\    |   ",
+        "  / >╨       |___|  / \\   _|_  ",
+      ]]},
+    { title:'COLHEITA', period:'OUT · NOV · DEZ', color:'var(--verde)', fx:'float', speed:420, confetti:true,
+      text:'13º, fechamento e aquela sensação boa de dever cumprido. <em>Mais um ciclo vencido — juntos.</em>',
+      frames:[[
+        " *    ✦     +    *    ✦    +   ",
+        "                            *  ",
+        "   \\o/   \\o/   \\o/   \\o/    ▲  ",
+        "    |     |     |     |    ▲▲▲ ",
+        "   / \\   / \\   / \\   / \\  ▲▲▲▲▲",
+        "  [$]   [♥]   [$]   [♥]    ║   ",
+      ],[
+        "   +   *    ✦   +    *    ✦  * ",
+        "                           *   ",
+        "    o/   \\o    o/   \\o      ▲  ",
+        "   /|     |\\  /|     |\\    ▲▲▲ ",
+        "   / \\   / \\   / \\   / \\  ▲▲▲▲▲",
+        "  [$]   [♥]   [$]   [♥]    ║   ",
+      ]]},
+  ];
+  // normaliza nº de linhas por fase
+  PHASES.forEach(p => { const n = Math.max(...p.frames.map(f=>f.length)); p.frames = p.frames.map(f => { const a=[...f]; while(a.length<7) a.unshift(''); return box(a); }); });
+
+  const SMAP = { '#':'w', '@':'w', '●':'g', '◘':'g', '═':'k', '{':'w', '}':'w' };
+  const SANTA_A = [
+    {t:"         .------.    @  ", c:'r'},
+    {t:"       .'        '. /   ", c:'r'},
+    {t:"      /____________\\/   ", c:'r'},
+    {t:"     (##############)   ", c:'w'},
+    {t:"      |  ◠      ◠  |    ", c:'s'},
+    {t:"      |     ()     |    ", c:'s'},
+    {t:"      |   \\____/   |    ", c:'s'},
+    {t:"       \\__________/     ", c:'s'},
+    {t:"     .-'|  \\  /  |'-.   ", c:'r', m:"           ww           "},
+    {t:"    /##/|   \\/   |\\##\\  ", c:'r', m:"            ww          "},
+    {t:"    |##||   ●    ||##|  ", c:'r'},
+    {t:"    |##||═══◘════||##|  ", c:'r'},
+    {t:"    |  ||   ●    ||  |  ", c:'r'},
+    {t:"     \\_||########||_/   ", c:'r'},
+    {t:"       (____)(____)     ", c:'k'},
+  ];
+  const SANTA_B = [
+    {t:"  @  .------.           ", c:'r'},
+    {t:"   \\.'        '.        ", c:'r'},
+    {t:"    /____________\\      ", c:'r'},
+    {t:"   (##############)     ", c:'w'},
+    {t:"    |  (◠)--(◠)  |      ", c:'s', m:"       gggggggg         "},
+    {t:"    |     ()     |      ", c:'s'},
+    {t:"   {{{\\  ___  /}}}      ", c:'w'},
+    {t:"  {{{{{\\_____/}}}}}     ", c:'w', m:"       sssssss          "},
+    {t:"   {{{{{{{}}}}}}}}      ", c:'w'},
+    {t:"   .-'{{{{{}}}}}'-.     ", c:'r'},
+    {t:"  /##/|  ●  ●  |\\##\\    ", c:'r'},
+    {t:"  |##||═══◘════||##|    ", c:'r'},
+    {t:"  |  ||   ●    ||  |    ", c:'r'},
+    {t:"   \\_||########||_/     ", c:'r'},
+    {t:"     (____)(____)       ", c:'k'},
+  ];
+
+  function treeRows(){
+    const rows = [], N = 11, Wd = 2*N+5;
+    const center = s => { const pad = Math.floor((Wd - [...s].length)/2); return ' '.repeat(pad) + s; };
+    rows.push(center('★'));
+    rows.push(center('/^\\'));
+    for(let r=1;r<N;r++){
+      let inner = '';
+      for(let i=0;i<2*r+1;i++){
+        const x = Math.random();
+        if((i + r*2) % 7 === 0) inner += '~';
+        else if(x < .16) inner += pick(['o','●','@','*']);
+        else inner += pick(['^','^','^','*']);
+      }
+      rows.push(center('/' + inner + '\\'));
+    }
+    rows.push(center('‾'.repeat(2*N+1)));
+    rows.push(center('|||'));
+    rows.push(center('[#]  |||  [♥]'));
+    return rows;
+  }
+  const TMAP = { '★':'g', '^':'v', '/':'v', '\\':'v', '‾':'v', '~':'g', '|':'o', '#':'w', '♥':'r', '[':'r', ']':'r' };
+  function treeDecor(s, ch){
+    if('o●@*'.includes(ch)){
+      s.classList.add('c-'+pick(['r','g','c','w']), 'tw');
+      s.style.setProperty('--tw', (1+Math.random()*1.6)+'s');
+      s.style.setProperty('--twd', (-Math.random()*2)+'s');
+    }
+    if(ch === '★'){ s.classList.add('tw'); s.style.setProperty('--tw','1.2s'); }
+  }
+  const BMAP = { '═':'d','║':'d','╗':'d','╝':'d','╔':'d','╚':'d' };
+
+  /* ---------------- cenas ---------------- */
+  const slides = [...document.querySelectorAll('.slide')];
+
+  // monta estrutura das fases
+  document.querySelectorAll('.slide.phase').forEach(sec => {
+    const p = PHASES[+sec.dataset.phase], k = +sec.dataset.phase;
+    sec.innerHTML = `
+      <div class="phase-head">
+        <p class="kicker">${p.period}</p>
+        <p class="phase-title" style="color:${p.color};text-shadow:0 0 18px ${p.color}">${p.title}</p>
+        <div class="dots">${PHASES.map((_,i)=>`<b class="${i<=k?'on':''}">${i===k?'◆':'◇'}</b>`).join('')}</div>
+      </div>
+      <div class="${p.fx}"><pre class="art office"></pre></div>
+      <p class="cap"></p>`;
+  });
+
+  const phaseScene = k => async (s, id) => {
+    const p = PHASES[k], pre = s.querySelector('pre'), cap = s.querySelector('.cap');
+    cap.textContent = '';
+    let f = 0;
+    render(pre, p.frames[0], {map:OMAP, fit:{w:.92, h:.38, max:20}});
+    every(p.speed * CONFIG.animacao, id, () => { f = (f+1) % p.frames.length; render(pre, p.frames[f], {map:OMAP, fit:pre._fit}); });
+    if(p.confetti) every(900, id, () => burst(W*(.15+Math.random()*.7), H*(.15+Math.random()*.25), 40));
+    await wait(700, id);
+    await type(cap, p.text, id, 28);
+  };
+
+  const scenes = [
+    // 1 logo
+    async (s,id) => {
+      $('wm').classList.remove('show'); $('c1').textContent = '';
+      render($('logoArt'), LOGO, {map:{}, fly:true, from:'top', stagger:1400, fit:{w:.7, h:.3, max:26}});
+      requestAnimationFrame(() => $('wm').classList.add('show'));
+      await wait(2900,id);
+      await type($('c1'), 'Ei, você. A gente tem uma coisa pra te mostrar.', id);
+    },
+    // 2 números
+    async (s,id) => {
+      const st = [...s.querySelectorAll('.stat')];
+      st.forEach(e => { e.classList.remove('show'); const n=e.querySelector('.n'); if(!n.hasAttribute('data-inf')) n.textContent='0'; });
+      $('c2').textContent = '';
+      for(const e of st){
+        await wait(380,id);
+        e.classList.add('show');
+        const n = e.querySelector('.n');
+        if(n.dataset.to) count(n, +n.dataset.to, id, n.dataset.prefix||'', n.dataset.suffix||'');
+      }
+      await wait(600,id);
+      await type($('c2'), '…e <em>várias histórias</em> pra contar.', id, 40);
+    },
+    // 3 prédio → andar
+    async (s,id) => {
+      const zw = $('zw'), oi = $('oiWrap');
+      zw.classList.remove('zoom'); oi.classList.remove('show'); $('c3').textContent = '';
+      const cells = render($('building'), BUILDING, {map:OMAP, fit:{w:.92, h:.42, max:20}});
+      [...$('building').children].forEach(r => r.classList?.remove('hl'));
+      render($('officeIdle'), IDLE, {map:OMAP, fit:{w:.92, h:.38, max:20}});
+      const wins = cells.flat().filter(c => c.textContent === '■');
+      every(260, id, () => pick(wins).classList.toggle('lit'));
+      await wait(1800,id);
+      const row1 = $('building').children[7*2]; // linha do 1º andar (span + \n)
+      const r1 = $('building').querySelectorAll('.row')[6];
+      r1.classList.add('hl');
+      await type($('c3'), 'Capital Financial Center, bloco B, 1º andar, <em>sala 126</em>…', id, 40);
+      await wait(900,id);
+      const zr = zw.getBoundingClientRect(), rr = r1.getBoundingClientRect();
+      zw.style.transformOrigin = `${rr.left - zr.left + rr.width*0.45}px ${rr.top - zr.top + rr.height/2}px`;
+      zw.classList.add('zoom');
+      await wait(700,id);
+      oi.classList.add('show');
+      await wait(400,id);
+      await type($('c3'), 'Aqui dentro, 2026 teve <em>quatro fases</em>.', id, 38);
+    },
+    phaseScene(0), phaseScene(1), phaseScene(2), phaseScene(3),
+    // 8 sócios
+    async (s,id) => {
+      $('c8').textContent = '';
+      const nm = n => FIG[n.toLowerCase()] || [n.toUpperCase()];
+      const fitN = {w:.42, h:.09, max:14};
+      render($('n1'), nm(CONFIG.socios[0]), {fly:true, stagger:900, fit:fitN});
+      render($('n2'), nm(CONFIG.socios[1]), {fly:true, stagger:900, fit:fitN});
+      const fitS = {w:.44, h:.42, max:18};
+      render($('s1'), SANTA_A, {map:SMAP, fly:true, from:'top', stagger:1200, fit:fitS});
+      render($('s2'), SANTA_B, {map:SMAP, fly:true, from:'top', stagger:1200, fit:fitS});
+      // nomes um pouco menores que os noéis: iguala as fontes
+      const f = Math.min(parseFloat($('s1').style.fontSize), parseFloat($('s2').style.fontSize));
+      [$('s1'),$('s2')].forEach(p => p.style.fontSize = f+'px');
+      const fn = Math.min(parseFloat($('n1').style.fontSize), parseFloat($('n2').style.fontSize));
+      [$('n1'),$('n2')].forEach(p => p.style.fontSize = fn+'px');
+      await wait(2600,id);
+      await type($('c8'), `${CONFIG.socios[0]} e ${CONFIG.socios[1]} têm um recado <em>pra você</em>.`, id, 34);
+    },
+    // 9 mensagem
+    async (s,id) => {
+      ['p1','p2','p3','p4'].forEach(p => $(p).textContent = '');
+      await wait(400,id);
+      await type($('p1'), 'Cada fechamento entregue, cada prazo cumprido e cada cliente bem atendido <em>tem o seu nome por trás.</em>', id, 24);
+      await wait(350,id);
+      await type($('p2'), 'Agradecemos imensamente o empenho, o esforço, a dedicação e o tempo que cada um de vocês investiu neste escritório ao longo de 2026.', id, 22);
+      await wait(350,id);
+      await type($('p3'), 'Obrigado por mais um ano de colaboração. Que venham muitos outros pela frente — <em>com conquistas, realizações e sonhos alcançados.</em>', id, 22);
+      await wait(400,id);
+      await type($('p4'), 'Da Gestão Contábil para você 🤝', id, 45);
+    },
+    // 10 FELIZ NATAL + árvore
+    async (s,id) => {
+      $('so').classList.remove('show');
+      const colorRows = (rows, cls) => rows.map(t => ({t, c:cls}));
+      const fb = {w:.9, h:.15, max:16};
+      render($('feliz'), colorRows(FIG.feliz,'r'), {map:BMAP, fly:true, stagger:1100, spread:1.3, fit:fb});
+      render($('natal'), colorRows(FIG.natal,'g'), {map:BMAP, fly:true, stagger:1100, spread:1.3, fit:fb});
+      const f = Math.min(parseFloat($('feliz').style.fontSize), parseFloat($('natal').style.fontSize));
+      [$('feliz'),$('natal')].forEach(p => p.style.fontSize = f+'px');
+      render($('tree'), treeRows(), {map:TMAP, fly:true, from:'top', stagger:1600, decorate:treeDecor, fit:{w:.6, h:.38, max:18}});
+      await wait(2200,id);
+      const r = $('feliz').getBoundingClientRect();
+      burst(r.left+r.width*.2, r.top+r.height/2, 60); burst(r.right-r.width*.2, r.top+r.height/2, 60);
+      every(1300, id, () => burst(W*(.1+Math.random()*.8), H*(.1+Math.random()*.3), 50));
+      $('so').classList.add('show');
+    },
+    // 11 2026 → 2027
+    async (s,id) => {
+      $('c11').textContent = '';
+      const cells = render($('year'), FIG.y2026.map(t=>({t})), {map:BMAP, fly:true, stagger:900, fit:{w:.9, h:.22, max:22}});
+      await wait(2300,id);
+      const pool = [...'█▓▒░╗╝═║#*+'];
+      const diff = [];
+      FIG.y2027.forEach((line, ri) => [...line].forEach((ch, ci) => { if(cells[ri][ci] && cells[ri][ci].textContent.replace('\u00a0',' ') !== ch) diff.push([cells[ri][ci], ch]); }));
+      const t0 = performance.now();
+      await new Promise(res => {
+        const iv = setInterval(() => {
+          if(id !== run){ clearInterval(iv); return; }
+          diff.forEach(([c]) => { c.textContent = pick(pool); c.className = 'ch c-c'; });
+          if(performance.now()-t0 > 1300){ clearInterval(iv); res(); }
+        }, 60);
+      });
+      diff.forEach(([c, ch]) => { c.textContent = ch === ' ' ? '\u00a0' : ch; c.className = 'ch c-c' + (BMAP[ch] ? ' c-d' : ''); });
+      const r = $('year').getBoundingClientRect();
+      burst(r.right - r.width*.12, r.top + r.height/2, 120);
+      for(let k=0;k<5;k++) setTimeout(() => id===run && burst(W*(.15+Math.random()*.7), H*(.12+Math.random()*.3), 60), 500+k*650);
+      await wait(400,id);
+      await type($('c11'), 'Feliz Natal <em>e Próspero Ano Novo!</em>', id, 45);
+    },
+    // 12 créditos
+    async (s,id) => {
+      buildCredits();
+      const roll = $('roll'), end = $('endBlock');
+      render($('endLogo'), LOGO, {map:{}, fit:{w:.5, h:.18, max:20}});
+      $('replay').classList.remove('show');
+      roll.style.transform = `translateY(${innerHeight}px)`;
+      await wait(500,id);
+      const endY = innerHeight/2 - (end.offsetTop + end.offsetHeight/2);
+      const dist = innerHeight - endY;
+      creditsAnim = roll.animate(
+        [{transform:`translateY(${innerHeight}px)`},{transform:`translateY(${endY}px)`}],
+        {duration: dist/CONFIG.creditosPxPorSeg*1000, easing:'linear', fill:'forwards'});
+      $('hint').textContent = 'toque para acelerar ›';
+      creditsAnim.onfinish = () => { if(id!==run) return; $('replay').classList.add('show'); $('hint').style.opacity = 0; burst(W/2, H*.3, 90); };
+    },
+  ];
+
+  let creditsAnim = null;
+  function buildCredits(){
+    const c = CONFIG, esc = s => s.replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+    const B = [];
+    B.push(`<p class="h"><b>FELIZ NATAL</b><br><i>& PRÓSPERO ANO NOVO</i></p>`);
+    B.push(`<p class="sub">uma produção Gestão Contábil · 2026</p><div class="sp"></div>`);
+    B.push(`<p class="t">direção geral</p><p class="n">${c.socios.map(esc).join('  ·  ')}</p>`);
+    B.push(`<p class="t">estrelando</p>` + c.colaboradores.map(([n, r]) => `<div class="cr"><span class="nm">${esc(n)}</span><span class="rl">${esc(r)}</span></div>`).join(''));
+    B.push(`<p class="t">setores envolvidos</p><p class="n">Contábil · Fiscal · Pessoal</p><p class="n">Paralegal · Financeiro</p><p class="n">T.I e Desenvolvimento · Comercial</p>`);
+    B.push(`<p class="t">falas memoráveis</p>` + c.bordoes.map(q => `<p class="q">${esc(q)}</p>`).join(''));
+    B.push(`<p class="t">direto da mesa do contador</p>` + c.bastidores.map(q => `<p class="q">${esc(q)}</p>`).join(''));
+    B.push(`<p class="t">agradecimentos especiais</p><p class="n">ao café</p><p class="n">ao ar-condicionado</p><p class="n">e a você, que fez 2026 acontecer</p>`);
+    B.push(`<div class="sp"></div><p class="fine">Nenhuma guia foi perdida durante as gravações deste ano.*</p><p class="fine">*que a gente saiba.</p>`);
+    B.push(`<div id="endBlock"><pre class="art" id="endLogo"></pre>
+              <div class="wordmark" style="opacity:1;transition:none">GESTÃO CONTÁBIL<span>Soluções Contábeis</span></div>
+              <button class="replay" id="replay">↺ ver de novo</button></div>`);
+    $('roll').innerHTML = B.join('');
+    $('replay').addEventListener('click', e => { e.stopPropagation(); go(0); });
+  }
+
+  /* ---------------- navegação ---------------- */
+  const bars = $('bars');
+  slides.forEach(() => { const b=document.createElement('div'); b.className='bar'; b.innerHTML='<i></i>'; bars.appendChild(b); });
+  const barEls = [...bars.children];
+  let cur = -1, timer = null;
+
+  function go(i){
+    if(i < 0 || i >= slides.length) return;
+    cur = i; const id = ++run;
+    clearTimeout(timer);
+    if(creditsAnim){ creditsAnim.cancel(); creditsAnim = null; }
+    slides.forEach((s,k) => s.classList.toggle('active', k===i));
+    const dur = Math.round(+slides[i].dataset.dur * CONFIG.ritmo);
+    barEls.forEach((b,k) => { b.className = 'bar' + (k<i ? ' done' : ''); b.style.setProperty('--dur', (dur||1)+'ms'); });
+    void barEls[i].offsetWidth; barEls[i].classList.add('now'); if(!dur) barEls[i].classList.add('hold');
+    const hint = $('hint'); hint.textContent = 'toque para avançar ›'; hint.style.opacity = '';
+    scenes[i](slides[i], id);
+    if(dur) timer = setTimeout(() => go(i+1), dur);
+  }
+
+  $('stage').addEventListener('click', e => {
+    if(e.target.closest('.replay')) return;
+    if(e.clientX < innerWidth*0.3) return go(cur-1);
+    if(cur === slides.length-1){
+      if(creditsAnim && creditsAnim.playState === 'running') creditsAnim.playbackRate = creditsAnim.playbackRate === 1 ? 4 : 1;
+      return;
+    }
+    go(cur+1);
+  });
+  addEventListener('keydown', e => {
+    if(e.key==='ArrowRight' || e.key===' ') go(cur+1);
+    if(e.key==='ArrowLeft') go(cur-1);
+  });
+
+  resize(); requestAnimationFrame(loop);
+  (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => go(0));
+})();
+</script>
+</body>
+</html>
