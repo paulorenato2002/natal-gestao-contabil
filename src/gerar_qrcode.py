@@ -36,7 +36,7 @@ d.polygon([(cx + r * math.cos(math.radians(60 * i + 30)), cy + r * math.sin(math
 center(40, "GESTÃO CONTÁBIL", font(34, True), (62, 198, 224))
 center(90, "um recado de fim de ano pra você", font(24), (138, 138, 143))
 center(140 + qr.height + 70, "aponte a câmera do celular", font(26, True), (234, 242, 245))
-center(140 + qr.height + 110, "FELIZ NATAL · 2026", font(22), (242, 193, 78))
+center(140 + qr.height + 110, "BOAS FESTAS · 2026", font(22), (242, 193, 78))
 
 card.save(out / "qrcode-cartao.png")
 qr.save(out / "qrcode-simples.png")
