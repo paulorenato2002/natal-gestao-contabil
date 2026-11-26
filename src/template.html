@@ -140,6 +140,15 @@
   #roll .fine{font-size:11px;color:var(--cinza);letter-spacing:.06em;margin-top:2px}
   #endBlock{margin-top:90px;display:flex;flex-direction:column;align-items:center;gap:16px;padding-bottom:40px}
   .replay{font-family:var(--mono);font-size:13px;letter-spacing:.15em;color:var(--ciano);background:transparent;border:1px solid rgba(62,198,224,.5);padding:10px 20px;border-radius:999px;cursor:pointer;opacity:0;transition:opacity 1s, background .3s;pointer-events:none}
+  .share{font-family:var(--mono);font-size:14px;letter-spacing:.08em;color:#06111a;font-weight:700;border:0;padding:13px 24px;border-radius:999px;cursor:pointer;
+         background:linear-gradient(90deg,#f9ce34,#ee2a7b 55%,#6228d7);color:#fff;box-shadow:0 0 24px rgba(238,42,123,.45);opacity:0;transform:translateY(10px);transition:opacity 1s, transform 1s;pointer-events:none}
+  .share.show{opacity:1;transform:none;pointer-events:auto}
+  .share:active{transform:scale(.97)}
+  .end-actions{display:flex;flex-direction:column;align-items:center;gap:12px}
+  .toast{position:fixed;left:50%;bottom:max(70px,env(safe-area-inset-bottom));transform:translate(-50%,20px);width:min(90vw,420px);background:rgba(13,26,40,.96);border:1px solid rgba(62,198,224,.45);
+         border-radius:14px;padding:14px 16px;font-size:13px;line-height:1.5;color:var(--branco);text-align:center;opacity:0;transition:all .4s;z-index:20;pointer-events:none}
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+  .toast b{color:var(--ciano);font-weight:400}
   .replay.show{opacity:1;pointer-events:auto}
   .replay:hover{background:rgba(62,198,224,.1)}
 
@@ -233,6 +242,8 @@ const CONFIG = {
   digitacao: 1.4,      // velocidade do texto digitado (maior = mais lento)
   animacao: 1.5,       // velocidade dos quadros do escritório (maior = mais lento)
   creditosPxPorSeg: 24,// velocidade dos créditos subindo
+  // @ do Instagram da Gestão Contábil (vai na imagem dos stories e é copiado para colar na menção)
+  instagram: '',
   // créditos: [nome, setor/cargo]
   colaboradores: [
     ['Alessandro Barreto', 'Contabilidade'],
@@ -698,6 +709,7 @@ const FIG = __FIG__;   // letreiros gerados pelo build.py (pyfiglet)
       const roll = $('roll'), end = $('endBlock');
       render($('endLogo'), LOGO, {map:{}, fit:{w:.5, h:.18, max:20}});
       $('replay').classList.remove('show');
+      if(!storyBlob) makeStory().then(b => storyBlob = b);
       roll.style.transform = `translateY(${innerHeight}px)`;
       await wait(500,id);
       const endY = innerHeight/2 - (end.offsetTop + end.offsetHeight/2);
@@ -706,7 +718,7 @@ const FIG = __FIG__;   // letreiros gerados pelo build.py (pyfiglet)
         [{transform:`translateY(${innerHeight}px)`},{transform:`translateY(${endY}px)`}],
         {duration: dist/CONFIG.creditosPxPorSeg*1000, easing:'linear', fill:'forwards'});
       $('hint').textContent = 'toque para acelerar ›';
-      creditsAnim.onfinish = () => { if(id!==run) return; $('replay').classList.add('show'); $('hint').style.opacity = 0; burst(W/2, H*.3, 90); };
+      creditsAnim.onfinish = () => { if(id!==run) return; $('replay').classList.add('show'); $('share').classList.add('show'); $('hint').style.opacity = 0; burst(W/2, H*.3, 90); };
     },
   ];
 
@@ -724,9 +736,74 @@ const FIG = __FIG__;   // letreiros gerados pelo build.py (pyfiglet)
     B.push(`<div class="sp"></div><p class="fine">Nenhuma guia foi perdida durante as gravações deste ano.*</p><p class="fine">*que a gente saiba.</p>`);
     B.push(`<div id="endBlock"><pre class="art" id="endLogo"></pre>
               <div class="wordmark" style="opacity:1;transition:none">GESTÃO CONTÁBIL<span>Soluções Contábeis</span></div>
-              <button class="replay" id="replay">↺ ver de novo</button></div>`);
+              <div class="end-actions">
+                <button class="share" id="share">📲 compartilhar nos stories</button>
+                <button class="replay" id="replay">↺ ver de novo</button>
+              </div></div>`);
     $('roll').innerHTML = B.join('');
     $('replay').addEventListener('click', e => { e.stopPropagation(); go(0); });
+    $('share').addEventListener('click', shareStory);
+  }
+
+
+  /* ---------------- imagem para os stories ---------------- */
+  let storyBlob = null;
+  function makeStory(){
+    const c = document.createElement('canvas'); c.width = 1080; c.height = 1920;
+    const g = c.getContext('2d');
+    const grd = g.createRadialGradient(540, 300, 50, 540, 800, 1500);
+    grd.addColorStop(0, '#11253c'); grd.addColorStop(1, '#060b12');
+    g.fillStyle = grd; g.fillRect(0, 0, 1080, 1920);
+    const mono = (px, w=400) => `${w} ${px}px "JetBrains Mono", monospace`;
+    for(let i=0;i<240;i++){
+      g.globalAlpha = .08 + Math.random()*.3; g.fillStyle = Math.random() < .25 ? '#3EC6E0' : '#EAF2F5';
+      g.font = mono(14 + Math.random()*22); g.fillText(pick(SNOW), Math.random()*1080, Math.random()*1920);
+    }
+    g.globalAlpha = 1; g.textBaseline = 'top';
+    const center = (t, y, px, col, w=400) => { g.font = mono(px, w); g.fillStyle = col; g.textAlign = 'center'; g.fillText(t, 540, y); g.textAlign = 'left'; };
+    const block = (rows, y, maxW, colorOf) => {
+      const cols = Math.max(...rows.map(r => [...r].length));
+      const fs = Math.min(60, maxW/(cols*0.6)), cw = fs*0.6, lh = fs*1.12, x0 = 540 - cols*cw/2;
+      g.font = mono(fs);
+      rows.forEach((r, ri) => [...r].forEach((ch, ci) => {
+        if(ch === ' ') return;
+        const col = colorOf(ch); g.shadowColor = col; g.shadowBlur = 14; g.fillStyle = col;
+        g.fillText(ch, x0 + ci*cw, y + ri*lh);
+      }));
+      g.shadowBlur = 0;
+      return y + rows.length*lh;
+    };
+    center('GESTÃO CONTÁBIL', 250, 40, '#3EC6E0', 700);
+    center('o meu 2026, contabilizado em momentos', 310, 28, '#8A8A8F');
+    let y = block(FIG.feliz, 400, 900, () => '#E5404F');
+    y = block(FIG.natal, y + 16, 900, () => '#F2C14E');
+    const tc = {'★':'#F2C14E','^':'#43C78A','/':'#43C78A','\\':'#43C78A','‾':'#43C78A','~':'#F2C14E','|':'#ff8a3d','#':'#EAF2F5','♥':'#E5404F','[':'#E5404F',']':'#E5404F'};
+    y = block(treeRows(), y + 40, 380, ch => 'o●@*'.includes(ch) ? pick(['#E5404F','#F2C14E','#3EC6E0','#EAF2F5']) : (tc[ch] || '#EAF2F5'));
+    center('2026 → 2027', y + 40, 52, '#3EC6E0', 700);
+    center('Boas festas e um próspero ano novo!', y + 115, 34, '#EAF2F5', 300);
+    if(CONFIG.instagram) center(CONFIG.instagram, 1600, 46, '#3EC6E0', 700);
+    return new Promise(r => c.toBlob(r, 'image/png'));
+  }
+  function toast(html){
+    let t = $('toast');
+    if(!t){ t = document.createElement('div'); t.id = 'toast'; t.className = 'toast'; document.body.appendChild(t); }
+    t.innerHTML = html; t.classList.add('show');
+    clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 6500);
+  }
+  function shareStory(e){
+    e.stopPropagation();
+    const h = CONFIG.instagram;
+    if(h && navigator.clipboard) navigator.clipboard.writeText(h).catch(() => {});
+    const tip = h ? `<b>${h}</b> copiado! No Instagram, escolha <b>Stories</b> e cole na figurinha de menção.` : 'Escolha o <b>Instagram → Stories</b>.';
+    if(!storyBlob){ toast('Preparando a imagem… toque de novo em 1 segundo.'); makeStory().then(b => storyBlob = b); return; }
+    const file = new File([storyBlob], 'boas-festas-gestao-contabil.png', {type:'image/png'});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      navigator.share({files:[file], title:'Boas festas · Gestão Contábil'}).catch(() => {});
+      toast(tip);
+    } else {
+      const a = document.createElement('a'); a.href = URL.createObjectURL(storyBlob); a.download = file.name; a.click();
+      toast(`Imagem salva! Poste nos Stories${h ? ` e marque <b>${h}</b> (já copiado)` : ''}.`);
+    }
   }
 
   /* ---------------- navegação ---------------- */
