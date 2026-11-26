@@ -100,6 +100,8 @@
   .dots{display:flex;gap:10px;font-size:12px;color:var(--chumbo)}
   .dots b{font-weight:400}
   .dots .on{color:var(--branco)}
+  .phase-body{display:flex;flex-direction:column;align-items:center;gap:clamp(14px,3vh,28px);transition:opacity .35s ease}
+  .slide.phase.swap .phase-body{opacity:0}
   pre.office{color:#c4cfd6;text-shadow:none}
 
   /* sócios */
@@ -187,19 +189,8 @@
   </section>
 
   <!-- 4..7 · fases (montadas via JS) -->
-  <section class="slide phase" data-dur="8500" data-phase="0"></section>
-  <section class="slide phase" data-dur="8500" data-phase="1"></section>
-  <section class="slide phase" data-dur="8000" data-phase="2"></section>
-  <section class="slide phase" data-dur="8000" data-phase="3"></section>
+  <section class="slide phase" data-dur="25500"></section>
 
-  <!-- 8 · sócios -->
-  <section class="slide" data-dur="9000">
-    <div class="santas">
-      <div class="santa float"><pre class="art" id="n1"></pre><pre class="art" id="s1"></pre></div>
-      <div class="santa float b"><pre class="art" id="n2"></pre><pre class="art" id="s2"></pre></div>
-    </div>
-    <p class="cap" id="c8"></p>
-  </section>
 
   <!-- 9 · mensagem -->
   <section class="slide" data-dur="17000">
@@ -242,8 +233,6 @@ const CONFIG = {
   digitacao: 1.4,      // velocidade do texto digitado (maior = mais lento)
   animacao: 1.5,       // velocidade dos quadros do escritório (maior = mais lento)
   creditosPxPorSeg: 24,// velocidade dos créditos subindo
-  // sócios: [esquerda (Noel moderno, sem barba), direita (Noel clássico, com barba)]
-  socios: ['Renato', 'Valter'],
   // créditos: [nome, setor/cargo]
   colaboradores: [
     ['Alessandro Barreto', 'Contabilidade'],
@@ -531,41 +520,6 @@ const FIG = __FIG__;   // letreiros gerados pelo build.py (pyfiglet)
   // normaliza nº de linhas por fase
   PHASES.forEach(p => { const n = Math.max(...p.frames.map(f=>f.length)); p.frames = p.frames.map(f => { const a=[...f]; while(a.length<7) a.unshift(''); return box(a); }); });
 
-  const SMAP = { '#':'w', '@':'w', '●':'g', '◘':'g', '═':'k', '{':'w', '}':'w' };
-  const SANTA_A = [
-    {t:"         .------.    @  ", c:'r'},
-    {t:"       .'        '. /   ", c:'r'},
-    {t:"      /____________\\/   ", c:'r'},
-    {t:"     (##############)   ", c:'w'},
-    {t:"      |  ◠      ◠  |    ", c:'s'},
-    {t:"      |     ()     |    ", c:'s'},
-    {t:"      |   \\____/   |    ", c:'s'},
-    {t:"       \\__________/     ", c:'s'},
-    {t:"     .-'|  \\  /  |'-.   ", c:'r', m:"           ww           "},
-    {t:"    /##/|   \\/   |\\##\\  ", c:'r', m:"            ww          "},
-    {t:"    |##||   ●    ||##|  ", c:'r'},
-    {t:"    |##||═══◘════||##|  ", c:'r'},
-    {t:"    |  ||   ●    ||  |  ", c:'r'},
-    {t:"     \\_||########||_/   ", c:'r'},
-    {t:"       (____)(____)     ", c:'k'},
-  ];
-  const SANTA_B = [
-    {t:"  @  .------.           ", c:'r'},
-    {t:"   \\.'        '.        ", c:'r'},
-    {t:"    /____________\\      ", c:'r'},
-    {t:"   (##############)     ", c:'w'},
-    {t:"    |  (◠)--(◠)  |      ", c:'s', m:"       gggggggg         "},
-    {t:"    |     ()     |      ", c:'s'},
-    {t:"   {{{\\  ___  /}}}      ", c:'w'},
-    {t:"  {{{{{\\_____/}}}}}     ", c:'w', m:"       sssssss          "},
-    {t:"   {{{{{{{}}}}}}}}      ", c:'w'},
-    {t:"   .-'{{{{{}}}}}'-.     ", c:'r'},
-    {t:"  /##/|  ●  ●  |\\##\\    ", c:'r'},
-    {t:"  |##||═══◘════||##|    ", c:'r'},
-    {t:"  |  ||   ●    ||  |    ", c:'r'},
-    {t:"   \\_||########||_/     ", c:'r'},
-    {t:"     (____)(____)       ", c:'k'},
-  ];
 
   function treeRows(){
     const rows = [], N = 11, Wd = 2*N+5;
@@ -601,28 +555,43 @@ const FIG = __FIG__;   // letreiros gerados pelo build.py (pyfiglet)
   /* ---------------- cenas ---------------- */
   const slides = [...document.querySelectorAll('.slide')];
 
-  // monta estrutura das fases
-  document.querySelectorAll('.slide.phase').forEach(sec => {
-    const p = PHASES[+sec.dataset.phase], k = +sec.dataset.phase;
-    sec.innerHTML = `
+  // monta estrutura das fases (uma cena só, passando pelas 4 fases)
+  const phaseSec = document.querySelector('.slide.phase');
+  phaseSec.innerHTML = `
+    <div class="phase-body">
       <div class="phase-head">
-        <p class="kicker">${p.period}</p>
-        <p class="phase-title" style="color:${p.color};text-shadow:0 0 18px ${p.color}">${p.title}</p>
-        <div class="dots">${PHASES.map((_,i)=>`<b class="${i<=k?'on':''}">${i===k?'◆':'◇'}</b>`).join('')}</div>
+        <p class="kicker" id="phK"></p>
+        <p class="phase-title" id="phT"></p>
+        <div class="dots" id="phD"></div>
       </div>
-      <div class="${p.fx}"><pre class="art office"></pre></div>
-      <p class="cap"></p>`;
-  });
+      <div id="phFx"><pre class="art office" id="phPre"></pre></div>
+      <p class="cap" id="phC"></p>
+    </div>`;
 
-  const phaseScene = k => async (s, id) => {
-    const p = PHASES[k], pre = s.querySelector('pre'), cap = s.querySelector('.cap');
-    cap.textContent = '';
-    let f = 0;
-    render(pre, p.frames[0], {map:OMAP, fit:{w:.92, h:.38, max:20}});
-    every(p.speed * CONFIG.animacao, id, () => { f = (f+1) % p.frames.length; render(pre, p.frames[f], {map:OMAP, fit:pre._fit}); });
-    if(p.confetti) every(900, id, () => burst(W*(.15+Math.random()*.7), H*(.15+Math.random()*.25), 40));
-    await wait(700, id);
-    await type(cap, p.text, id, 28);
+  const phasesScene = async (s, id) => {
+    let timers = [];
+    const stop = () => { timers.forEach(clearInterval); timers = []; };
+    for(let k = 0; k < PHASES.length; k++){
+      if(id !== run) return stop();
+      const p = PHASES[k], pre = $('phPre');
+      s.classList.add('swap');
+      if(k) await wait(260, id);
+      stop();
+      $('phK').textContent = p.period;
+      $('phT').textContent = p.title;
+      $('phT').style.cssText = `color:${p.color};text-shadow:0 0 18px ${p.color}`;
+      $('phD').innerHTML = PHASES.map((_,i) => `<b class="${i<=k?'on':''}">${i===k?'◆':'◇'}</b>`).join('');
+      $('phFx').className = p.fx;
+      $('phC').textContent = '';
+      let f = 0;
+      render(pre, p.frames[0], {map:OMAP, fit:{w:.92, h:.38, max:20}});
+      timers.push(every(p.speed * CONFIG.animacao, id, () => { f = (f+1) % p.frames.length; render(pre, p.frames[f], {map:OMAP, fit:pre._fit}); }));
+      if(p.confetti) timers.push(every(900, id, () => burst(W*(.15+Math.random()*.7), H*(.15+Math.random()*.25), 40)));
+      s.classList.remove('swap');
+      await wait(500, id);
+      await type($('phC'), p.text, id, 28);
+      await wait(2600, id);
+    }
   };
 
   const scenes = [
@@ -671,26 +640,8 @@ const FIG = __FIG__;   // letreiros gerados pelo build.py (pyfiglet)
       await wait(400,id);
       await type($('c3'), 'Aqui dentro, 2026 teve <em>quatro fases</em>.', id, 38);
     },
-    phaseScene(0), phaseScene(1), phaseScene(2), phaseScene(3),
-    // 8 sócios
-    async (s,id) => {
-      $('c8').textContent = '';
-      const nm = n => FIG[n.toLowerCase()] || [n.toUpperCase()];
-      const fitN = {w:.42, h:.09, max:14};
-      render($('n1'), nm(CONFIG.socios[0]), {fly:true, stagger:900, fit:fitN});
-      render($('n2'), nm(CONFIG.socios[1]), {fly:true, stagger:900, fit:fitN});
-      const fitS = {w:.44, h:.42, max:18};
-      render($('s1'), SANTA_A, {map:SMAP, fly:true, from:'top', stagger:1200, fit:fitS});
-      render($('s2'), SANTA_B, {map:SMAP, fly:true, from:'top', stagger:1200, fit:fitS});
-      // nomes um pouco menores que os noéis: iguala as fontes
-      const f = Math.min(parseFloat($('s1').style.fontSize), parseFloat($('s2').style.fontSize));
-      [$('s1'),$('s2')].forEach(p => p.style.fontSize = f+'px');
-      const fn = Math.min(parseFloat($('n1').style.fontSize), parseFloat($('n2').style.fontSize));
-      [$('n1'),$('n2')].forEach(p => p.style.fontSize = fn+'px');
-      await wait(2600,id);
-      await type($('c8'), `${CONFIG.socios[0]} e ${CONFIG.socios[1]} têm um recado <em>pra você</em>.`, id, 34);
-    },
-    // 9 mensagem
+    phasesScene,
+    // mensagem
     async (s,id) => {
       ['p1','p2','p3','p4'].forEach(p => $(p).textContent = '');
       await wait(400,id);
@@ -765,7 +716,6 @@ const FIG = __FIG__;   // letreiros gerados pelo build.py (pyfiglet)
     const B = [];
     B.push(`<p class="h"><b>FELIZ NATAL</b><br><i>& PRÓSPERO ANO NOVO</i></p>`);
     B.push(`<p class="sub">uma produção Gestão Contábil · 2026</p><div class="sp"></div>`);
-    B.push(`<p class="t">direção geral</p><p class="n">${c.socios.map(esc).join('  ·  ')}</p>`);
     B.push(`<p class="t">estrelando</p>` + c.colaboradores.map(([n, r]) => `<div class="cr"><span class="nm">${esc(n)}</span><span class="rl">${esc(r)}</span></div>`).join(''));
     B.push(`<p class="t">setores envolvidos</p><p class="n">Contábil · Fiscal · Pessoal</p><p class="n">Paralegal · Financeiro</p><p class="n">T.I e Desenvolvimento · Comercial</p>`);
     B.push(`<p class="t">falas memoráveis</p>` + c.bordoes.map(q => `<p class="q">${esc(q)}</p>`).join(''));

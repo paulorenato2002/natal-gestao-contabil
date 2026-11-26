@@ -8,8 +8,6 @@ def fig(text, font):
     w = max(len(l) for l in lines)
     return [l.ljust(w) for l in lines]
 FIG = {
-  'renato': fig('RENATO', 'small'),
-  'valter': fig('VALTER', 'small'),
   'feliz':  fig('FELIZ', 'ansi_shadow'),
   'natal':  fig('NATAL', 'ansi_shadow'),
   'y2026':  fig('2026', 'ansi_shadow'),
